@@ -1,5 +1,5 @@
 ---
-name: 01 Continuous Integration
+name: 01 CI - Redis Enterprise
 on:
   pull_request:
     branches:
@@ -13,6 +13,11 @@ on:
         required: true
         default: "latest"
         type: string
+      folder_name:
+        description: "Folder Name to run terraform in"
+        required: true
+        default: "redisenterprise"
+        type: string
 
 jobs:
   validate:
@@ -22,7 +27,7 @@ jobs:
       - name: Validate Terraform
         uses: ContosoBeach/int-dev-template/.github/actions/validate@main
         with:
-          root_module_folder_relative_path: "."
+          root_module_folder_relative_path: ${{ inputs.folder_name }}
           terraform_cli_version: ${{ inputs.terraform_cli_version }}
 
   dev_plan:
@@ -33,12 +38,12 @@ jobs:
       id-token: write
       contents: read
     with:
-      root_module_folder_relative_path: "."
+      root_module_folder_relative_path: ${{ inputs.folder_name }}
       name: dev
       display_name: Development
       runner_name: self-hosted
       environment_name_plan: dev-plan
       environment_name_apply: dev-apply
       dependent_environment: ""
-      backend_azure_storage_account_container_name: redisenterprise
+      backend_azure_storage_account_container_name: dev
       terraform_cli_version: ${{ inputs.terraform_cli_version }}
