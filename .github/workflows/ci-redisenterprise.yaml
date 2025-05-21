@@ -1,5 +1,5 @@
 ---
-name: 01 Continuous Integration
+name: 01 CI - Redis Enterprise
 on:
   pull_request:
     branches:
