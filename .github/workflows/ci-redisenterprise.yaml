@@ -45,5 +45,5 @@ jobs:
       environment_name_plan: dev-plan
       environment_name_apply: dev-apply
       dependent_environment: ""
-      backend_azure_storage_account_container_name: ${{ inputs.folder_name }}
+      backend_azure_storage_account_container_name: dev
       terraform_cli_version: ${{ inputs.terraform_cli_version }}
