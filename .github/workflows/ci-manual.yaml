@@ -1,11 +1,6 @@
 ---
-name: 01 CI - Redis Enterprise
+name: 01 Continuous Integration
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "redisenterprise/*.tf"
   workflow_dispatch:
     inputs:
       terraform_cli_version:

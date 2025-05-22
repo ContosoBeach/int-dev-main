@@ -1,11 +1,6 @@
 ---
-name: 02 CD - Redis Enterprise
+name: 02 Continuous Delivery
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "redisenterprise/*.tf"
   workflow_dispatch:
     inputs:
       environment:
