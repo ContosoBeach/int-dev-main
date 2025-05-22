@@ -38,6 +38,7 @@ module "redisent-vnet-primary" {
 
     }
   }
+  tags = local.tags
 }
 
 module "redisent-vnet-secondary" {
@@ -87,6 +88,7 @@ module "redisent-vnet-secondary" {
       reverse_use_remote_gateways          = false
     }
   }
+  tags = local.tags
 }
 
 module "redis-private-dns-zone" {
