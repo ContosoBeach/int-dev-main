@@ -29,6 +29,7 @@ resource "azurerm_private_endpoint" "redisent-pe-primary" {
     name                 = "${local.prefix}-pe-primary"
     private_dns_zone_ids = [module.redis-private-dns-zone.resource_id]
   }
+  depends_on = [azurerm_redis_enterprise_database.default-primary]
 }
 
 resource "azurerm_redis_enterprise_cluster" "redisent-secondary" {
@@ -63,6 +64,7 @@ resource "azurerm_private_endpoint" "redisent-pe-secondary" {
     name                 = "${local.prefix}-pe-secondary"
     private_dns_zone_ids = [module.redis-private-dns-zone.resource_id]
   }
+  depends_on = [azurerm_redis_enterprise_database.default-secondary]
 }
 
 resource "azurerm_redis_enterprise_database" "default-primary" {
