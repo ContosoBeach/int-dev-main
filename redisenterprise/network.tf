@@ -23,12 +23,19 @@ module "redisent-vnet-primary" {
   }
   peerings = {
     "redisent-vnet-primary-to-agent" = {
-      name                               = "${local.prefix}-vnet-primary-to-agent"
-      remote_virtual_network_resource_id = data.azurerm_virtual_network.agent-vnet.id
-      allow_virtual_network_access       = true
-      allow_forwarded_traffic            = true
-      allow_gateway_transit              = false
-      use_remote_gateways                = false
+      name                                 = "${local.prefix}-vnet-primary-to-agent"
+      remote_virtual_network_resource_id   = data.azurerm_virtual_network.agent-vnet.id
+      allow_virtual_network_access         = true
+      allow_forwarded_traffic              = true
+      allow_gateway_transit                = false
+      use_remote_gateways                  = false
+      create_reverse_peering               = true
+      reverse_name                         = "agent-to-${local.prefix}-vnet-primary"
+      reverse_allow_virtual_network_access = true
+      reverse_allow_forwarded_traffic      = true
+      reverse_allow_gateway_transit        = false
+      reverse_use_remote_gateways          = false
+
     }
   }
 }
@@ -52,12 +59,18 @@ module "redisent-vnet-secondary" {
   }
   peerings = {
     "redisent-vnet-secondary-to-agent" = {
-      name                               = "${local.prefix}-vnet-secondary-to-agent"
-      remote_virtual_network_resource_id = data.azurerm_virtual_network.agent-vnet.id
-      allow_virtual_network_access       = true
-      allow_forwarded_traffic            = true
-      allow_gateway_transit              = false
-      use_remote_gateways                = false
+      name                                 = "${local.prefix}-vnet-secondary-to-agent"
+      remote_virtual_network_resource_id   = data.azurerm_virtual_network.agent-vnet.id
+      allow_virtual_network_access         = true
+      allow_forwarded_traffic              = true
+      allow_gateway_transit                = false
+      use_remote_gateways                  = false
+      create_reverse_peering               = true
+      reverse_name                         = "agent-to-${local.prefix}-vnet-secondary"
+      reverse_allow_virtual_network_access = true
+      reverse_allow_forwarded_traffic      = true
+      reverse_allow_gateway_transit        = false
+      reverse_use_remote_gateways          = false
     }
   }
 }
