@@ -71,6 +71,20 @@ module "redisent-vnet-secondary" {
       reverse_allow_forwarded_traffic      = true
       reverse_allow_gateway_transit        = false
       reverse_use_remote_gateways          = false
+    },
+    "primary-to-secondary" = {
+      name                                 = "secondary-to-primary"
+      remote_virtual_network_resource_id   = module.redisent-vnet-primary.resource_id
+      allow_virtual_network_access         = true
+      allow_forwarded_traffic              = true
+      allow_gateway_transit                = false
+      use_remote_gateways                  = false
+      create_reverse_peering               = true
+      reverse_name                         = "primary-to-secondary"
+      reverse_allow_virtual_network_access = true
+      reverse_allow_forwarded_traffic      = true
+      reverse_allow_gateway_transit        = false
+      reverse_use_remote_gateways          = false
     }
   }
 }
