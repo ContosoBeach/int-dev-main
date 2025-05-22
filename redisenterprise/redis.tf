@@ -36,8 +36,8 @@ resource "azurerm_redis_enterprise_database" "default-databases" {
     name = "RedisJSON"
   }
   linked_database_id = [
-    concat(azurerm_redis_enterprise_cluster.redisent-cluster["primary"].id, "/databases/${each.value.database_name}"),
-    concat(azurerm_redis_enterprise_cluster.redisent-cluster["secondary"].id, "/databases/${each.value.database_name}"),
+    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["primary"].id, "databases/${each.value.database_name}"),
+    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["secondary"].id, "databases/${each.value.database_name}"),
   ]
 
   linked_database_group_nickname = "${local.prefix}GeoGroup"
