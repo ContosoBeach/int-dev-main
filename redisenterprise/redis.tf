@@ -1,75 +1,32 @@
-resource "azurerm_redis_enterprise_cluster" "redisent-primary" {
-  name                = "${local.prefix}-primary"
+locals {
+  redis-cluster = {
+    primary = {
+      name          = "${local.prefix}-primary"
+      location      = local.primary_region
+      database_name = "default"
+    }
+    secondary = {
+      name          = "${local.prefix}-secondary"
+      location      = local.secondary_region
+      database_name = "default"
+    }
+  }
+}
+
+
+resource "azurerm_redis_enterprise_cluster" "redisent-cluster" {
+  for_each            = local.redis-cluster
+  name                = each.value.name
   resource_group_name = azurerm_resource_group.redisent-rg.name
-  location            = local.primary_region
+  location            = each.value.location
 
   sku_name = "Enterprise_E5-2"
-  depends_on = [
-    module.redis-private-dns-zone,
-    module.redisent-vnet-primary,
-    module.redisent-vnet-secondary
-  ]
 }
 
-resource "azurerm_private_endpoint" "redisent-pe-primary" {
-  name                = "${local.prefix}-pe-primary"
-  location            = local.primary_region
-  resource_group_name = azurerm_resource_group.redisent-rg.name
-
-  subnet_id = module.redisent-vnet-primary.subnets["subnet2"].resource_id
-
-  private_service_connection {
-    name                           = "${local.prefix}-psc-primary"
-    private_connection_resource_id = azurerm_redis_enterprise_cluster.redisent-primary.id
-    subresource_names              = ["redisEnterprise"]
-    is_manual_connection           = false
-  }
-
-  private_dns_zone_group {
-    name                 = "${local.prefix}-pe-primary"
-    private_dns_zone_ids = [module.redis-private-dns-zone.resource_id]
-  }
-  depends_on = [azurerm_redis_enterprise_database.default-primary]
-}
-
-resource "azurerm_redis_enterprise_cluster" "redisent-secondary" {
-  name                = "${local.prefix}-secondary"
-  resource_group_name = azurerm_resource_group.redisent-rg.name
-  location            = local.secondary_region
-
-  sku_name = "Enterprise_E5-2"
-  depends_on = [
-    module.redis-private-dns-zone,
-    module.redisent-vnet-primary,
-    module.redisent-vnet-secondary
-  ]
-
-}
-
-resource "azurerm_private_endpoint" "redisent-pe-secondary" {
-  name                = "${local.prefix}-pe-secondary"
-  location            = local.secondary_region
-  resource_group_name = azurerm_resource_group.redisent-rg.name
-
-  subnet_id = module.redisent-vnet-secondary.subnets["subnet2"].resource_id
-
-  private_service_connection {
-    name                           = "${local.prefix}-psc-secondary"
-    private_connection_resource_id = azurerm_redis_enterprise_cluster.redisent-secondary.id
-    subresource_names              = ["redisEnterprise"]
-    is_manual_connection           = false
-  }
-
-  private_dns_zone_group {
-    name                 = "${local.prefix}-pe-secondary"
-    private_dns_zone_ids = [module.redis-private-dns-zone.resource_id]
-  }
-  depends_on = [azurerm_redis_enterprise_database.default-secondary]
-}
-
-resource "azurerm_redis_enterprise_database" "default-primary" {
-  name              = "default"
-  cluster_id        = azurerm_redis_enterprise_cluster.redisent-primary.id
+resource "azurerm_redis_enterprise_database" "default-databases" {
+  for_each          = local.redis-cluster
+  name              = each.value.database_name
+  cluster_id        = azurerm_redis_enterprise_cluster.redisent-cluster[each.key].id
   clustering_policy = "EnterpriseCluster"
   eviction_policy   = "NoEviction"
   module {
@@ -79,28 +36,35 @@ resource "azurerm_redis_enterprise_database" "default-primary" {
     name = "RedisJSON"
   }
   linked_database_id = [
-    "${azurerm_redis_enterprise_cluster.redisent-primary.id}/databases/default",
-    "${azurerm_redis_enterprise_cluster.redisent-secondary.id}/databases/default"
+    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["primary"].id, "databases/${each.value.database_name}"),
+    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["secondary"].id, "databases/${each.value.database_name}"),
   ]
 
   linked_database_group_nickname = "${local.prefix}GeoGroup"
 }
 
-resource "azurerm_redis_enterprise_database" "default-secondary" {
-  name              = "default"
-  cluster_id        = azurerm_redis_enterprise_cluster.redisent-secondary.id
-  clustering_policy = "EnterpriseCluster"
-  eviction_policy   = "NoEviction"
-  module {
-    name = "RediSearch"
-  }
-  module {
-    name = "RedisJSON"
-  }
-  linked_database_id = [
-    "${azurerm_redis_enterprise_cluster.redisent-primary.id}/databases/default",
-    "${azurerm_redis_enterprise_cluster.redisent-secondary.id}/databases/default"
-  ]
+resource "azurerm_private_endpoint" "redisent-pes" {
+  for_each            = local.redis-cluster
+  name                = "${local.prefix}-pe-${each.key}"
+  location            = each.value.location
+  resource_group_name = azurerm_resource_group.redisent-rg.name
 
-  linked_database_group_nickname = "${local.prefix}GeoGroup"
+  subnet_id = module.redisent-vnets["${each.key}"].subnets["subnet2"].resource_id
+
+  private_service_connection {
+    name                           = "${local.prefix}-psc-${each.key}"
+    private_connection_resource_id = azurerm_redis_enterprise_cluster.redisent-cluster["${each.key}"].id
+    subresource_names              = ["redisEnterprise"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "${local.prefix}-pe-${each.key}"
+    private_dns_zone_ids = [module.redis-private-dns-zone.resource_id]
+  }
+  depends_on = [
+    module.redis-private-dns-zone,
+    module.redisent-vnets,
+    azurerm_redis_enterprise_database.default-databases
+  ]
 }
