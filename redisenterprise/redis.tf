@@ -6,17 +6,8 @@ resource "azurerm_redis_enterprise_cluster" "redisent-primary" {
   sku_name = "Enterprise_E5-2"
   depends_on = [
     module.redis-private-dns-zone,
-    # module.redis-private-dns-zone.azurerm_private_dns_zone_virtual_network_link.this["primary"],
-    # module.redis-private-dns-zone.azurerm_private_dns_zone_virtual_network_link.this["secondary"],
-    # module.redis-private-dns-zone.azurerm_private_dns_zone_virtual_network_link.this["agent"],
     module.redisent-vnet-primary,
     module.redisent-vnet-secondary
-    # module.redisent-vnet-primary.module.peering["${local.prefix}-vnet-primary-to-agent"].azapi_resource.this[0],
-    # module.redisent-vnet-primary.module.peering["${local.prefix}-vnet-primary-to-agent"].azapi_resource.reverse[0],
-    # module.redisent-vnet-secondary.module.peering["${local.prefix}-vnet-secondary-to-agent"].azapi_resource.this[0],
-    # module.redisent-vnet-secondary.module.peering["${local.prefix}-vnet-secondary-to-agent"].azapi_resource.reverse[0],
-    # module.redisent-vnet-secondary.module.peering["primary-to-secondary"].azapi_resource.this[0],
-    # module.redisent-vnet-secondary.module.peering["primary-to-secondary"].azapi_resource.reverse[0],
   ]
 }
 
@@ -46,6 +37,12 @@ resource "azurerm_redis_enterprise_cluster" "redisent-secondary" {
   location            = local.secondary_region
 
   sku_name = "Enterprise_E5-2"
+  depends_on = [
+    module.redis-private-dns-zone,
+    module.redisent-vnet-primary,
+    module.redisent-vnet-secondary
+  ]
+
 }
 
 resource "azurerm_private_endpoint" "redisent-pe-secondary" {
