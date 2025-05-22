@@ -23,10 +23,9 @@ resource "azurerm_redis_enterprise_cluster" "redisent-cluster" {
   sku_name = "Enterprise_E5-2"
 }
 
-resource "azurerm_redis_enterprise_database" "default-databases" {
-  for_each          = local.redis-cluster
-  name              = each.value.database_name
-  cluster_id        = azurerm_redis_enterprise_cluster.redisent-cluster[each.key].id
+resource "azurerm_redis_enterprise_database" "default-database" {
+  name              = "default"
+  cluster_id        = azurerm_redis_enterprise_cluster.redisent-cluster["primary"].id
   clustering_policy = "EnterpriseCluster"
   eviction_policy   = "NoEviction"
   module {
@@ -36,8 +35,8 @@ resource "azurerm_redis_enterprise_database" "default-databases" {
     name = "RedisJSON"
   }
   linked_database_id = [
-    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["primary"].id, "databases/${each.value.database_name}"),
-    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["secondary"].id, "databases/${each.value.database_name}"),
+    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["primary"].id, "databases/default"),
+    format("%s/%s", azurerm_redis_enterprise_cluster.redisent-cluster["secondary"].id, "databases/default")
   ]
 
   linked_database_group_nickname = "${local.prefix}GeoGroup"
