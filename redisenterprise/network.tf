@@ -22,10 +22,10 @@ locals {
 }
 
 
-data "azurerm_virtual_network" "agent-vnet" {
-  name                = "vnet-int-dev-scus-001"
-  resource_group_name = "rg-int-agents-dev-scus-001"
-}
+# data "azurerm_virtual_network" "agent-vnet" {
+#   name                = "vnet-int-dev-scus-001"
+#   resource_group_name = "rg-int-agents-dev-scus-001"
+# }
 
 
 module "redisent-vnets" {
@@ -46,23 +46,23 @@ module "redisent-vnets" {
       address_prefixes = each.value.subnet2_space
     }
   }
-  peerings = {
-    "peering-${each.key}" = {
-      name                                 = each.value.peering_name
-      remote_virtual_network_resource_id   = data.azurerm_virtual_network.agent-vnet.id
-      allow_virtual_network_access         = true
-      allow_forwarded_traffic              = true
-      allow_gateway_transit                = false
-      use_remote_gateways                  = false
-      create_reverse_peering               = true
-      reverse_name                         = each.value.peering_reverse_name
-      reverse_allow_virtual_network_access = true
-      reverse_allow_forwarded_traffic      = true
-      reverse_allow_gateway_transit        = false
-      reverse_use_remote_gateways          = false
+  # peerings = {
+  #   "peering-${each.key}" = {
+  #     name                                 = each.value.peering_name
+  #     remote_virtual_network_resource_id   = data.azurerm_virtual_network.agent-vnet.id
+  #     allow_virtual_network_access         = true
+  #     allow_forwarded_traffic              = true
+  #     allow_gateway_transit                = false
+  #     use_remote_gateways                  = false
+  #     create_reverse_peering               = true
+  #     reverse_name                         = each.value.peering_reverse_name
+  #     reverse_allow_virtual_network_access = true
+  #     reverse_allow_forwarded_traffic      = true
+  #     reverse_allow_gateway_transit        = false
+  #     reverse_use_remote_gateways          = false
 
-    }
-  }
+  #   }
+  # }
   tags = local.tags
 }
 
@@ -81,9 +81,9 @@ module "redis-private-dns-zone" {
       vnetlinkname = "${local.prefix}-vnet-secondary"
       vnetid       = module.redisent-vnets["secondary"].resource_id
     }
-    "agent" = {
-      vnetlinkname = "agent-vnet"
-      vnetid       = data.azurerm_virtual_network.agent-vnet.id
-    }
+    # "agent" = {
+    #   vnetlinkname = "agent-vnet"
+    #   vnetid       = data.azurerm_virtual_network.agent-vnet.id
+    # }
   }
 }
