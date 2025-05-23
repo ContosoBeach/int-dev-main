@@ -47,7 +47,7 @@ module "redisent-vnets" {
     }
   }
   peerings = {
-    "peering1" = {
+    "peering-${each.key}" = {
       name                                 = each.value.peering_name
       remote_virtual_network_resource_id   = data.azurerm_virtual_network.agent-vnet.id
       allow_virtual_network_access         = true
