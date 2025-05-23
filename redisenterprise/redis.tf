@@ -64,6 +64,6 @@ resource "azurerm_private_endpoint" "redisent-pes" {
   depends_on = [
     module.redis-private-dns-zone,
     module.redisent-vnets,
-    azurerm_redis_enterprise_database.default-databases
+    azurerm_redis_enterprise_database.default-database
   ]
 }
