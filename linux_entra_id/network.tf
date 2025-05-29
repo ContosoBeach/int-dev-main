@@ -37,10 +37,10 @@ module "linux-vnets" {
   subnets = {
     for k, v in each.value.subnets :
     k => {
-      name           = v.name
-      address_prefix = v.space
+      name             = v.name
+      address_prefixes = v.space
       network_security_group = {
-        id = module.network-networksecuritygroups["${each.value.name}-${v.name}-nsg"].resource_id
+        id = module.networksecuritygroups["${each.value.name}-${v.name}-nsg"].resource_id
       }
     }
   }
@@ -50,21 +50,20 @@ module "linux-vnets" {
 locals {
   vnet_subnets = flatten([
     for vnet_key, vnet in local.linux_vnets : [
-      for subnet_key, subnet in vnet.subnets : {
-        vnet_name   = vnet.name
-        subnet_name = subnet.name
-      }
+      for subnet_key, subnet in vnet.subnets : [
+        "${vnet_key}-${subnet_key}"
+      ]
     ]
   ])
-  vnet_subnets_map = { for index, subnet in local.vnet_subnets : index => subnet }
+  vnet_subnets_map = { for subnet in local.vnet_subnets : subnet => subnet }
 }
 
 
-module "network-networksecuritygroups" {
+module "networksecuritygroups" {
   source              = "Azure/avm-res-network-networksecuritygroup/azurerm"
   version             = "0.4.0"
   for_each            = local.vnet_subnets_map
-  name                = "${each.value.vnet_name}-${each.value.subnet_name}-nsg"
+  name                = "${each.value}-nsg"
   resource_group_name = azurerm_resource_group.this-rg.name
   location            = azurerm_resource_group.this-rg.location
 }
