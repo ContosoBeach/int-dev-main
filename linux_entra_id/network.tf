@@ -56,7 +56,7 @@ locals {
       }
     ]
   ])
-  vnet_subnets_map = { for subnet in local.vnet_subnets : "${subnet.vnet_name}-${subnet.subnet_name}" => subnet }
+  vnet_subnets_map = { for index, subnet in local.vnet_subnets : index => subnet }
 }
 
 
@@ -64,7 +64,7 @@ module "network-networksecuritygroups" {
   source              = "Azure/avm-res-network-networksecuritygroup/azurerm"
   version             = "0.4.0"
   for_each            = local.vnet_subnets_map
-  name                = "${each.key}-nsg"
+  name                = "${each.value.vnet_name}-${each.value.subnet_name}-nsg"
   resource_group_name = azurerm_resource_group.this-rg.name
   location            = azurerm_resource_group.this-rg.location
 }
