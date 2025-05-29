@@ -26,8 +26,8 @@ module "public-ip" {
   source  = "Azure/avm-res-network-publicipaddress/azurerm"
   version = "0.2.0"
 
-  resource_group_name = "azurerm_resource_group.this-rg.name"
-  location            = "azurerm_resource_group.this-rg.location"
+  resource_group_name = azurerm_resource_group.this-rg.name
+  location            = azurerm_resource_group.this-rg.location
   name                = module.naming.public_ip.name_unique
 }
 
@@ -80,29 +80,29 @@ module "linux-vms" {
 
 }
 
-module "avm-res-authorization-roleassignment" {
-  source  = "Azure/avm-res-authorization-roleassignment/azurerm"
-  version = "0.2.0"
+# module "avm-res-authorization-roleassignment" {
+#   source  = "Azure/avm-res-authorization-roleassignment/azurerm"
+#   version = "0.2.0"
 
-  users_by_user_principal_name = {
-    admin = var.admin_user_principal_name
-  }
+#   users_by_user_principal_name = {
+#     admin = var.admin_user_principal_name
+#   }
 
-  role_definitions = {
-    "Virtual Machine Administrator Login" = {
-      name = "Virtual Machine Administrator Login"
-    }
-  }
+#   role_definitions = {
+#     "Virtual Machine Administrator Login" = {
+#       name = "Virtual Machine Administrator Login"
+#     }
+#   }
 
-  role_assignments_for_resource_groups = {
-    this-group = {
-      resource_group_name = azurerm_resource_group.this-rg.name
-      role_assignments = {
-        "admin" = {
-          role_definition = "Virtual Machine Administrator Login"
-          users           = ["admin"]
-        }
-      }
-    }
-  }
-}
+#   role_assignments_for_resource_groups = {
+#     this-group = {
+#       resource_group_name = azurerm_resource_group.this-rg.name
+#       role_assignments = {
+#         "admin" = {
+#           role_definition = "Virtual Machine Administrator Login"
+#           users           = ["admin"]
+#         }
+#       }
+#     }
+#   }
+# }
