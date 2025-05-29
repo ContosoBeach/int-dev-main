@@ -51,8 +51,9 @@ locals {
   vnet_subnets = flatten([
     for vnet_key, vnet in local.linux_vnets : [
       for subnet_key, subnet in vnet.subnets : {
-        vnet_name   = vnet.name
-        subnet_name = subnet.name
+        combined_name = "${vnet.name}-${subnet.name}"
+        vnet_name     = vnet.name
+        subnet_name   = subnet.name
       }
     ]
   ])
@@ -63,7 +64,7 @@ module "network-networksecuritygroups" {
   source  = "Azure/avm-res-network-networksecuritygroup/azurerm"
   version = "0.4.0"
   for_each = tomap({
-    for subnet in local.vnet_subnets : "${vnet_name}-${subnet_name}" => subnet
+    for subnet in local.vnet_subnets : subnet.combined_name => subnet
   })
   name                = "${each.key}-nsg"
   resource_group_name = azurerm_resource_group.this-rg.name
