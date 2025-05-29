@@ -7,7 +7,7 @@ variable "subscription_id" {
 variable "region" {
   description = "The Azure region where the resources will be created."
   type        = string
-  default     = "eastus2"
+  default     = "southcentralus"
 }
 
 variable "admin_user_principal_name" {
