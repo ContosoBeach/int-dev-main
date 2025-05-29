@@ -63,7 +63,7 @@ module "network-networksecuritygroups" {
   source  = "Azure/avm-res-network-networksecuritygroup/azurerm"
   version = "0.4.0"
   for_each = tomap({
-    for subnet in local.vnet_subnets : "${subnet.vnet_name}-${subnet.subnet_name}" => subnet
+    for subnet in local.vnet_subnets : "${vnet_name}-${subnet_name}" => subnet
   })
   name                = "${each.key}-nsg"
   resource_group_name = azurerm_resource_group.this-rg.name
