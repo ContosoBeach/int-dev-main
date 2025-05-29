@@ -8,7 +8,7 @@ module "regions" {
   version = "0.5.2"
 
   availability_zones_filter = true
-  useuse_cached_data        = false
+  use_cached_data           = false
 }
 
 resource "random_string" "postfix" {
