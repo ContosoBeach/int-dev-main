@@ -10,6 +10,12 @@ module "regions" {
   availability_zones_filter = true
 }
 
+resource "random_string" "postfix" {
+  length  = 4
+  upper   = false
+  special = false
+}
+
 resource "azurerm_resource_group" "this-rg" {
   location = var.region
   name     = module.naming.resource_group.name_unique

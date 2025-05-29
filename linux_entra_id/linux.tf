@@ -28,7 +28,7 @@ module "public-ip" {
 
   resource_group_name = "azurerm_resource_group.this-rg.name"
   location            = "azurerm_resource_group.this-rg.location"
-  name                = module.naming.public_ip_address.name_unique
+  name                = module.naming.public_ip.name_unique
 }
 
 module "linux-vms" {
