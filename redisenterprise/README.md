@@ -1,0 +1,1 @@
+# Azure Redis Enterprise cluster with georeplication and private endpoints

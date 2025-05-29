@@ -1,0 +1,1 @@
+# Linux VM with Entra ID authentication
