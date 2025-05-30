@@ -40,7 +40,7 @@ module "linux-vnets" {
       name             = v.name
       address_prefixes = v.space
       network_security_group = {
-        id = module.networksecuritygroups["${each.key}-${k}-nsg"].resource_id
+        id = module.networksecuritygroups["${each.key}-${k}"].resource_id
       }
     }
   }
