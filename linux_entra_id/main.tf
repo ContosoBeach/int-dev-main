@@ -11,12 +11,6 @@ module "regions" {
   use_cached_data           = false
 }
 
-resource "random_string" "postfix" {
-  length  = 4
-  upper   = false
-  special = false
-}
-
 resource "azurerm_resource_group" "this-rg" {
   location = var.region
   name     = module.naming.resource_group.name_unique

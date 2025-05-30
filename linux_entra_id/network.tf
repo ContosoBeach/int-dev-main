@@ -1,7 +1,7 @@
 locals {
   linux_vnets = {
     primary = {
-      name          = "${local.prefix}-vnet"
+      name          = module.naming.virtual_network.name_unique
       address_space = ["10.1.0.0/16"]
       subnets = {
         subnet1 = {
@@ -14,8 +14,8 @@ locals {
         }
       }
       location             = var.region
-      peering_name         = "${local.prefix}-vnet-to-agent"
-      peering_reverse_name = "agent-to-${local.prefix}-vnet"
+      peering_name         = "${module.naming.virtual_network.name_unique}-to-agent"
+      peering_reverse_name = "agent-to-${module.naming.virtual_network.name_unique}-vnet"
     }
   }
 }
