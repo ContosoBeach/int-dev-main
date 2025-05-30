@@ -22,14 +22,14 @@ module "vm_sku" {
   depends_on = [random_integer.zone_index]
 }
 
-module "public-ip" {
-  source  = "Azure/avm-res-network-publicipaddress/azurerm"
-  version = "0.2.0"
+# module "public-ip" {
+#   source  = "Azure/avm-res-network-publicipaddress/azurerm"
+#   version = "0.2.0"
 
-  resource_group_name = azurerm_resource_group.this-rg.name
-  location            = azurerm_resource_group.this-rg.location
-  name                = module.naming.public_ip.name_unique
-}
+#   resource_group_name = azurerm_resource_group.this-rg.name
+#   location            = azurerm_resource_group.this-rg.location
+#   name                = module.naming.public_ip.name_unique
+# }
 
 module "linux-vms" {
   source  = "Azure/avm-res-compute-virtualmachine/azurerm"
@@ -60,7 +60,8 @@ module "linux-vms" {
         ip_configuration_1 = {
           name                          = "${module.naming.network_interface.name_unique}-ipconfig1"
           private_ip_subnet_resource_id = module.linux-vnets["primary"].subnets["subnet1"].resource_id
-          public_ip_address_id          = module.public-ip.resource_id
+          create_public_ip_address      = true
+          public_ip_address_name        = module.naming.public_ip.name_unique
         }
       }
     }
@@ -72,7 +73,7 @@ module "linux-vms" {
       publisher                  = "Microsoft.Azure.ActiveDirectory"
       type                       = "AADSSHLoginForLinux"
       type_handler_version       = "1.0"
-      auto_upgrade_minor_version = true
+      auto_upgrade_minor_version = false
     }
   }
 
