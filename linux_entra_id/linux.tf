@@ -77,7 +77,8 @@ module "linux-vms" {
     }
   }
 
-  tags = local.tags
+  tags       = local.tags
+  depends_on = [module.linux-vnets]
 
 }
 
